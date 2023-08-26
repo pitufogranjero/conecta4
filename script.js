@@ -5,8 +5,6 @@
 // diseñar el prompt para preguntar a chatGPT cual sería la siguiente jugada
 
 
-
-
 // variables
 let board = [
     [0,0,0,0,0,0,0],
@@ -20,7 +18,46 @@ let colorTurn = getRandomColor();
 let turn = 0;
 let WINNER = 0;
 let PLAYERS = 2;
+let IA_COLOR = 0;
 changeTurn();
+
+// recojo la elección del numero de jugadores de la partida
+const onePlayer = document.getElementById('1-player');
+const twoPlayer = document.getElementById('2-player');
+
+onePlayer.addEventListener('click', function() {
+    PLAYERS = 1;
+    restartGame();
+    document.getElementById('choose-level').innerHTML = "";
+    document.getElementById('choose-player-number').innerHTML = "";
+
+});
+twoPlayer.addEventListener('click', function() {
+    document.getElementById('choose-player-number').innerHTML = "";
+    restartGame();
+    PLAYERS = 2;
+    IA_COLOR = getRandomColor();
+    const easyButton = document.createElement('button');
+    easyButton.classList.add("button");
+    easyButton.setAttribute('id', 'easy-button');
+    easyButton.textContent = "Easy";
+    const hardButton = document.createElement('button');
+    hardButton.classList.add("button");
+    hardButton.setAttribute('id', 'hard-button');
+    hardButton.textContent = "Hard (IA)";
+
+    document.getElementById('choose-level').appendChild(easyButton);
+    document.getElementById('choose-level').appendChild(hardButton);
+});
+
+
+
+// funcion de espera para que la IA devuelva una jugada
+
+
+// creamos el prompt para la IA
+let prompt = `Estamos jugando a Conecta 4 y tu color es el ${IA_COLOR}, ahora es tu turno y el tablero es el siguiente ${board}, ¿cual sería tu próxima jugada? respóndeme sólo con el número de columna donde pondrías tu siguiente ficha. Sólo el número`;
+
 
 // crear un array con la primera posición libre de cada columna
 freeSpot = [0,0,0,0,0,0,0]
@@ -230,6 +267,33 @@ function getRandomColor() {
     const randomIndex = Math.floor(Math.random() * colors.length);
     return colors[randomIndex];
 }
+
+
+// #################################
+// ############ chatGPT ############
+// #################################
+
+const { Configuration, OpenAIApi } = require("openai");
+require('dotenv').config()
+
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+    });
+    const openai = new OpenAIApi(configuration);
+
+async function runCompletion () {
+    const completion = await openai.createCompletion({
+    model: "gpt-3.5-turbo",
+    prompt: prompt,
+    max_tokens:4000
+    });
+    console.log(completion.data.choices[0].text);
+}
+runCompletion();
+
+
+
+
 
 // prints
 function printConsole(){
