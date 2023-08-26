@@ -1,3 +1,12 @@
+// TODO
+// hacer una pila con las fichas disponibles
+// completar la funcion que verifica si hay 4 consecutivas en diagonal
+// crear las funciones para "1 player" y "2 players"
+// diseñar el prompt para preguntar a chatGPT cual sería la siguiente jugada
+
+
+
+
 // variables
 let board = [
     [0,0,0,0,0,0,0],
@@ -10,12 +19,12 @@ let board = [
 let colorTurn = getRandomColor();
 let turn = 0;
 let WINNER = 0;
+let PLAYERS = 2;
 changeTurn();
 
 // crear un array con la primera posición libre de cada columna
 freeSpot = [0,0,0,0,0,0,0]
 
-// hacer una pila con las fichas disponibles
 
 // detectar en que columna se ha hecho click y colocar la ficha
 const cells = document.querySelectorAll('.cell');
