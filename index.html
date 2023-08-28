@@ -9,15 +9,14 @@
 </head>
 <body>
     <h1>Conecta4</h1>
-    <div id="choose-player-number">
-        <button class="button" id="1-player">1 Player</button>
-        <button class="button" id="2-player">2 Player</button>
-    </div>
+    <div id="choose-player-number"></div>
     <div id="choose-level"></div>
 
-    <h4>Actual turn <span id='turn-number'></span>: <span id='turn'></span></h4>
+    <h4 class="actual-turn" id="actual-turn">Actual turn <span id='turn-number'></span>: <span id='turn'></span></h4>
+    <h4><span id='player-color'></span></h4>
     <h4 class="winner"></h4>
-    <div class="board">
+    <div class="board" id="board">
+        <!-- <div id="overlay" class="overlay"></div> -->
         <div class="row 5">
             <div class="cell col-0 row-5"><div class="hole"></div></div>
             <div class="cell col-1 row-5"><div class="hole"></div></div>
@@ -79,5 +78,6 @@
     <div>
         <button class="button" id="restart-button">Restart</button>
     </div>
+    <div id="debug"></div>
 </body>
 </html>
