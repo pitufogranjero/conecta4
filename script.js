@@ -302,8 +302,9 @@ function getRandomColor() {
 // ############ chatGPT ############
 // #################################
 
-const apiKey = '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';
-const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
+require('dotenv').config();
+const apiKey = process.env.CHATGPT_API_KEY;
+// const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
 
 // funcion de espera para que la IA devuelva una jugada
 async function iaPlay(board,IA_COLOR){
