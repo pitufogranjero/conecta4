@@ -1,12 +1,22 @@
+import { OPENAI_API_KEY } from './env.js';
+
+
 // TODO
 // hacer una pila con las fichas disponibles
-// completar la funcion que verifica si hay 4 consecutivas en diagonal
+// completar la funcion que verifica si hay 4 consecutivas en DIAGONAL
+// corregir la ubicación de las pieces para que estén en el div correcto sin que afecte a la posición en pantalla tras la animacion
+
+// DONE
 // crear las funciones para "1 player" y "2 players"
 // diseñar el prompt para preguntar a chatGPT cual sería la siguiente jugada
+// limitar para que no puedas jugar cuando esta blur
+// limitar el numero de fichas en una columna a 6
 
 
 // variables
-let board = 0;
+const rows = 6;
+const cols = 7;
+let board = [];
 let colorTurn = getRandomColor();
 let games = 0;
 let WINNER = 0;
@@ -14,6 +24,98 @@ let PLAYERS = 0;
 let IA_COLOR = 0;
 let PLAYER_COLOR = 0;
 let LEVEL = '';
+let allowClick = false;
+let freeSpot = [0,0,0,0,0,0,0]
+
+// ##########################
+// ### construyo el board ###
+// ##########################
+
+function setBoard(rows,cols){
+    board = [];
+
+    const boardDiv = document.getElementById('board');
+
+    for (let r = rows-1; r >= 0; r--){
+
+        const rowContainer = document.createElement('div');
+        rowContainer.classList.add(`row`);
+        rowContainer.classList.add(`${r}`);
+        boardDiv.appendChild(rowContainer)
+
+        for (let c = 0; c < cols; c++){
+            
+            const tile = document.createElement('div');
+            tile.classList.add(`cell`);
+            tile.classList.add(`col-${c}`);
+            tile.classList.add(`row-${r}`);
+            rowContainer.appendChild(tile);
+            const hole = document.createElement('div');
+            hole.classList.add('hole');
+            tile.appendChild(hole);
+        }
+    }
+    const restartButton = document.createElement('button');
+    restartButton.classList.add('button');
+    restartButton.setAttribute('id', 'restart-button');
+    restartButton.textContent = 'Restart';
+    document.getElementById('restart').appendChild(restartButton)
+}
+// creo el tablero
+setBoard(rows,cols);
+addBlur();
+
+// ##############################
+// ### construyo players-info ###
+// ##############################
+
+const playersInfo = document.getElementById('players-info');
+
+function setPlayersInfo(color1,color2,playerMessage){
+    const playerOneIndicator = document.createElement('div');
+    const turnInfo = document.createElement('div');
+    const playerTwoIndicator = document.createElement('div');
+
+    playerOneIndicator.classList.add('player');
+    playerOneIndicator.classList.add('one');
+
+    turnInfo.classList.add('turn-info');
+    turnInfo.setAttribute('id','turn-info');
+    
+    playerTwoIndicator.classList.add('player');
+    playerTwoIndicator.classList.add('two');
+
+    playersInfo.appendChild(playerOneIndicator);
+    playersInfo.appendChild(turnInfo);
+    playersInfo.appendChild(playerTwoIndicator);
+
+    const pieceOne = document.createElement('div');
+    const pieceTwo = document.createElement('div');
+
+    pieceOne.classList.add('piece');
+    pieceOne.classList.add(color1);
+    pieceTwo.classList.add('piece');
+    pieceTwo.classList.add(color2);
+
+    playerOneIndicator.appendChild(pieceOne);
+    playerTwoIndicator.appendChild(pieceTwo);
+
+    const playerOneLabel = document.createElement('div');
+    const playerTwoLabel = document.createElement('div');
+    playerOneLabel.classList.add('label');
+    playerOneLabel.textContent = '1';
+    playerTwoLabel.classList.add('label');
+    playerTwoLabel.textContent = '2';
+    pieceOne.appendChild(playerOneLabel);
+    pieceTwo.appendChild(playerTwoLabel);
+
+    const actualTurn = document.getElementById('turn-info');
+    actualTurn.innerHTML = `<span>${playerMessage}:&nbsp;</span>`;
+    actualTurn.innerHTML += `<span id='turn' class='${colorTurn}-text'>${colorTurn}</span>`;
+    // actualTurn.innerHTML += `<div class="piece ${colorTurn}" style="width:40px; display:flex"></div>`;
+    const actualTurnIndicator = document.getElementById('turn');
+    
+}
 
 
 // creo los botones
@@ -39,26 +141,19 @@ hardButton.textContent = "Hard (IA)";
 
 const restartButton = document.getElementById('restart-button');
 
-const playerInfo = document.getElementById('player-color');
+const playerInfo = document.getElementById('players-info');
 
 const turnSpan = document.querySelector("#turn");
 
 const divWinner = document.querySelector('.winner');
 
-// crear un array con la primera posición libre de cada columna
-freeSpot = [0,0,0,0,0,0,0]
 
 
 // Carga inicial del juego
 restartBoard();
 showPlayersButtons();
-addBlur();
+// addBlur();
 // changeTurn();
-
-
-
-
-
 
 // capturo los clicks en los botones
 onePlayer.addEventListener('click', chooseOnePlayer);
@@ -67,43 +162,15 @@ twoPlayer.addEventListener('click', chooseTwoPlayer);
 easyButton.addEventListener('click', chooseEasyLevel)
 hardButton.addEventListener('click', chooseHardLevel)
 
-restartButton.addEventListener('click', function() {
-    showPlayersButtons();
-    restartGame();
-    addBlur();
-});
+if(restartButton){
+    restartButton.addEventListener('click', () => {
+        showPlayersButtons();
+        restartGame();
+        addBlur();
+    });
+}
 
 
-// detectar en que columna se ha hecho click y colocar la ficha
-const cells = document.querySelectorAll('.cell');
-cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-        if(WINNER == 0){
-
-            columnClicked = numericClass(cell.classList);
-
-            // incrementar el turno
-            games = games + 1;
-
-            // y la pinto en pantalla
-            paintPiece(columnClicked,colorTurn)
-
-            animatePiece(colorTurn,columnClicked,freeSpot[columnClicked])
-            
-            // marco como ocupada la casilla de esa columna
-            freeSpot[columnClicked] = freeSpot[columnClicked] + 1;
-            
-            // pongo la ficha de este color en la matriz del tablero
-            board[6-freeSpot[columnClicked]][columnClicked] = colorTurn;
-
-            // compruebo si hay un ganador
-            checkWinner(board)
-
-            // cambio el turno
-            changeTurn();        
-        }
-        })
-    })
 
 // de la lista de clases obtenida, selecciono la que es numerica
 function numericClass(list){
@@ -118,37 +185,40 @@ function numericClass(list){
 
 // animar la caída de la ficha hasta su posición 
 function animatePiece(color,column,row){
-    const divInicio = document.querySelector('.cell.col-'+column+'.row-5');
-    const divFinal = document.querySelector('.cell.col-'+column+'.row-'+row);
+    console.log(row)
+    const divStart = document.querySelector('.cell.col-'+column+'.row-5');
+    const divEnd = document.querySelector('.cell.col-'+column+'.row-'+row);
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
     // console.log(piece)
 
-    const startY = divInicio.offsetTop + divInicio.offsetHeight / 2;
-    
-    const finalY = divFinal.offsetTop + divFinal.offsetHeight / 2 - startY;
+    const startY = divStart.offsetTop + divStart.offsetHeight / 2;
+    const finalY = divEnd.offsetTop + divEnd.offsetHeight / 2 - startY;
+        
     piece.style.transform = `${startY}px)`;
-
     setTimeout(() => {
         piece.style.transform = `translateY(${finalY}px)`;
         piece.style.transition= 'all 0.5s ease-in';
     }, 0);
+    piece.classList.remove('row-5');
+    piece.classList.add('row-'+row);
 }
 
 
 // marcar el turno que toca y cambiarlo al hacer click
 function changeTurn(){
-    console.log('ejecuto changeTurn desde '+colorTurn);
-    turnSpan.classList.remove(colorTurn+'-text');
+    // console.log('ejecuto changeTurn desde '+colorTurn);
+    // const turnSpan = document.getElementById('turn')
+    // turnSpan.classList.remove(colorTurn+'-text');
     if (colorTurn == 'yellow') colorTurn = 'red'
     else colorTurn = 'yellow'
-    turnSpan.textContent = colorTurn;
-    turnSpan.classList.add(colorTurn+'-text');
-    document.querySelector("#turn-number").textContent = games;
+    // turnSpan.textContent = colorTurn;
+    // turnSpan.classList.add(colorTurn+'-text');
     // si hay cambio de turno y estamos en modo 1 player, miro si le toca jugar a la máquina
-    console.log(PLAYERS+'\n'+WINNER+'\n'+IA_COLOR+'\n'+colorTurn)
+    // console.log(PLAYERS+'\n'+WINNER+'\n'+IA_COLOR+'\n'+colorTurn)
     if(PLAYERS == 1 && WINNER == 0 && IA_COLOR == colorTurn){
-        console.log('le toca jugar a la IA');
-        jugadaIA = iaPlay(board,IA_COLOR)
+        console.log('turn to IA');
+        // jugadaIA = iaPlay(board,IA_COLOR)
+        iaPlay(board,IA_COLOR);
         }   
 }
 
@@ -158,14 +228,20 @@ function putPiece(column){
         freeSpot[column] = color;
         }
 }
-function paintPiece(column,color){
+function paintPiece(column,color,freeSpot){
     const divCell = document.querySelector('.cell.col-'+column+'.row-5'); //+freeSpot[column])
+    // console.log(divCell.classList)
+    // divCell.removeChild(divCell.firstChild);
     const divPiece = document.createElement('div');
     divPiece.classList.add('piece');
     divPiece.classList.add('turn-'+games);
     divPiece.classList.add(color);
-    // divPiece.classList.add('falling-piece');
     divCell.appendChild(divPiece);
+
+    // const divPiece1 = document.createElement('div');
+    // divPiece1.classList.add('small');
+    // divPiece1.style('top:0px')
+    // divPiece.appendChild(divPiece1);
 }
 
 
@@ -176,15 +252,24 @@ function paintPiece(column,color){
 // comprobar si hay 4 fichas consecutivas iguales en las filas
 function checkHorizontals (board,color){
     let sum = 1;
+    // console.log(printBoard(board))
+    // console.log('horizontals '+color)
+    // console.log('rows '+board.length)
+    // console.log('cols '+board[0].length)
+    // console.log('sum '+sum)
     // recorro las filas
     for (let row = 0; row < board.length; row++) {
+        // console.log('row number '+row)
         // recorro las columnas
         for(let col = 0; col < board[row].length; col++){
+            // console.log('col number '+col)
+            // console.log('posicion '+board[row][col]);
             if (board[row][col+1] == color && board[row][col] == color) {
                 sum = sum + 1;
                 // console.log(color+' fila '+i+' suma '+sum)
             } else {
                 sum = 1;
+                // console.log(color+' fila '+i+' suma '+sum)
             }
             if (sum == 4) return true;
         }
@@ -234,16 +319,14 @@ function checkWinner(board){
         }
 }
 
-// #################################
-// ### COMPROBACION DE GANADORES ###
-// #################################
-
 // winner message
 function winnerMessage(color){
     WINNER = color;
+    allowClick = false;
     // alert(color)
-
-    divWinner.innerHTML = 'The winner is... '+color+' in '+games+' movements';
+    const divWinner = document.getElementById('turn-info')
+    divWinner.innerHTML = "";
+    divWinner.innerHTML = 'The winner is '+color;
     divWinner.classList.add(color);
 
     turnSpan.textContent == '';
@@ -257,14 +340,18 @@ function restartGame() {
     games = 0;
     freeSpot = [0,0,0,0,0,0,0];
 
+    playersInfo.innerHTML = "";
+
     // borro el mensaje de winner
-    document.querySelector('.winner').innerHTML = "";
-    document.querySelector('.winner').classList.remove('red');
-    document.querySelector('.winner').classList.remove('yellow');
+    // document.querySelector('.winner').innerHTML = "";
+    // document.querySelector('.winner').classList.remove('red');
+    // document.querySelector('.winner').classList.remove('yellow');
 
     // borro el mensaje de playerInfo
-    playerInfo.textContent = '';
+    // playerInfo.textContent = '';
+
     erasePieces();
+    restartBoard()
 
     WINNER = 0;
     showPlayersButtons();
@@ -290,7 +377,6 @@ function restartBoard(){
         ]
 }
 
-
 // aleatorio para calcular quien empieza
 function getRandomColor() {
     const colors = ["red", "yellow"];
@@ -298,17 +384,30 @@ function getRandomColor() {
     return colors[randomIndex];
 }
 
+// me devuelve el otro color
+function swapColors(inputColor) {
+    const colorMap = {
+        'yellow': 'red',
+        'red': 'yellow'
+    };
+    if (colorMap.hasOwnProperty(inputColor)) {
+        return colorMap[inputColor];
+        } else {
+            return 'Color not found';
+        }
+    }
+
 // #################################
 // ############ chatGPT ############
 // #################################
 
-require('dotenv').config();
-const apiKey = process.env.CHATGPT_API_KEY;
-// const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
 
+const apiKey = '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';
+const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
+// const apikey = OPENAI_API_KEY;
 // funcion de espera para que la IA devuelva una jugada
 async function iaPlay(board,IA_COLOR){
-    console.log('ejectuo iaPlay')
+    console.log('ejecuto iaPlay')
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer "+apiKey);
@@ -353,7 +452,7 @@ async function iaPlay(board,IA_COLOR){
         freeSpot[columnaElegida] = freeSpot[columnaElegida] + 1;
         
         checkWinner(board);
-        printConsole();
+        // printConsole();
         changeTurn();
                 
         } catch (error) {
@@ -364,17 +463,20 @@ async function iaPlay(board,IA_COLOR){
 
 // desenfoques
 function removeBlur() {
+    allowClick = true;
     document.getElementById('board').classList.remove('blur');
-    document.getElementById('actual-turn').classList.remove('blur');
+    // document.getElementById('actual-turn').classList.remove('blur');
     document.getElementById('restart-button').classList.remove('blur');
 }
 function addBlur() {
+    allowClick = false;
     document.getElementById('board').classList.add('blur');
-    document.getElementById('actual-turn').classList.add('blur');
+    // document.getElementById('actual-turn').classList.add('blur');
     document.getElementById('restart-button').classList.add('blur');
+    // document.getElementById('players-info').classList.add('blur');
 }
 
-// imprimir amigablemente el tablero
+// imprimir en console.log amigablemente el tablero
 function printBoard(board){
     for (let i = 0; i < board.length; i++) {
         console.log(`${i}: ${board[i].join(', ')}`);
@@ -385,23 +487,25 @@ function printBoard(board){
 // ### funciones para los botones ####
 // ###################################
 
+function chooseTwoPlayer(){
+    PLAYERS = 2;
+    allowClick = true;
+    hidePlayersButtons();
+    setPlayersInfo('red','yellow','Next turn');
+    // restartGame();
+    removeBlur();
+    // setBoard(rows,cols);
+    printConsole();
+}
+
 function chooseOnePlayer(){
     hidePlayersButtons();
     showLevelButtons();
     PLAYERS = 1;
 
-    IA_COLOR = getRandomColor();
     if(IA_COLOR == 'yellow') PLAYER_COLOR = 'red';
     else PLAYER_COLOR = 'yellow';
-    printConsole();
-}
-
-function chooseTwoPlayer(){
-    hidePlayersButtons();
-    PLAYERS = 2;
-    restartGame();
-    removeBlur();
-    printConsole();
+    // printConsole();
 }
 
 function chooseEasyLevel(){
@@ -413,8 +517,13 @@ function chooseEasyLevel(){
 }
 
 function chooseHardLevel(){
+    IA_COLOR = getRandomColor();
+    PLAYER_COLOR = swapColors(IA_COLOR);
     changeTurn();
-    playerInfo.textContent = 'You are playing against IA, your color is: ' + PLAYER_COLOR;
+
+    if (colorTurn == PLAYER_COLOR) setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Your Turn');
+    else setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Turn to IA');
+    // turn.textContent = 'Your color is: ' + PLAYER_COLOR;
     LEVEL = 'hard';
     removeBlur();
     // restartGame();
@@ -460,13 +569,27 @@ function printConsole(){
     // console.log(`turn: ${colorTurn}`)
     // console.log(`next free row: ${freeSpot[columnClicked]}`)
     // console.log(`clicked on column: ${columnClicked}`)
-    console.log(printBoard(board));
-    console.log(`Game: Players ${PLAYERS} || Winner ${WINNER} || IAColor ${IA_COLOR} || Turn ${colorTurn}`);
+    // console.log(printBoard(board));
+    console.log(`Game: Players ${PLAYERS} || Winner ${WINNER} || IAColor ${IA_COLOR} || Turn ${colorTurn} || allowClick ${allowClick}`);
 }
 
-printConsole();
+// printConsole();
 
-function debug(content){
-    const debugContainer = document.getElementById('debug');
-    debugContainer.textContent += content;
-}
+// detectar en que columna se ha hecho click y colocar la ficha
+const cells = document.querySelectorAll('.cell');
+cells.forEach(cell => {
+    cell.addEventListener("click", () => {
+        if (allowClick){
+            const column = numericClass(cell.classList)
+            games = games + 1;
+            if(freeSpot[column] < 6){
+                paintPiece(column,colorTurn,freeSpot)
+                animatePiece(colorTurn,column,freeSpot[column])
+                freeSpot[column] = freeSpot[column] + 1;
+                board[6-freeSpot[column]][column] = colorTurn;
+                checkWinner(board)
+                changeTurn();    
+            }
+        }
+    })
+});

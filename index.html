@@ -3,81 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conecta 4</title>
+    <title>Connect 4</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <script type="module" src="script.js" defer></script>
 </head>
 <body>
-    <h1>Conecta4</h1>
+    <h1>Connect4</h1>
     <div id="choose-player-number"></div>
     <div id="choose-level"></div>
-
-    <h4 class="actual-turn" id="actual-turn">Actual turn <span id='turn-number'></span>: <span id='turn'></span></h4>
-    <h4><span id='player-color'></span></h4>
-    <h4 class="winner"></h4>
-    <div class="board" id="board">
-        <!-- <div id="overlay" class="overlay"></div> -->
-        <div class="row 5">
-            <div class="cell col-0 row-5"><div class="hole"></div></div>
-            <div class="cell col-1 row-5"><div class="hole"></div></div>
-            <div class="cell col-2 row-5"><div class="hole"></div></div>
-            <div class="cell col-3 row-5"><div class="hole"></div></div>
-            <div class="cell col-4 row-5"><div class="hole"></div></div>
-            <div class="cell col-5 row-5"><div class="hole"></div></div>
-            <div class="cell col-6 row-5"><div class="hole"></div></div>
-        </div>
-        <div class="row 4">
-            <div class="cell col-0 row-4"><div class="hole"></div></div>
-            <div class="cell col-1 row-4"><div class="hole"></div></div>
-            <div class="cell col-2 row-4"><div class="hole"></div></div>
-            <div class="cell col-3 row-4"><div class="hole"></div></div>
-            <div class="cell col-4 row-4"><div class="hole"></div></div>
-            <div class="cell col-5 row-4"><div class="hole"></div></div>
-            <div class="cell col-6 row-4"><div class="hole"></div></div>
-        </div>
-        <div class="row 3">
-            <div class="cell col-0 row-3"><div class="hole"></div></div>
-            <div class="cell col-1 row-3"><div class="hole"></div></div>
-            <div class="cell col-2 row-3"><div class="hole"></div></div>
-            <div class="cell col-3 row-3"><div class="hole"></div></div>
-            <div class="cell col-4 row-3"><div class="hole"></div></div>
-            <div class="cell col-5 row-3"><div class="hole"></div></div>
-            <div class="cell col-6 row-3"><div class="hole"></div></div>
-        </div>
-        <div class="row 2">
-            <div class="cell col-0 row-2"><div class="hole"></div></div>
-            <div class="cell col-1 row-2"><div class="hole"></div></div>
-            <div class="cell col-2 row-2"><div class="hole"></div></div>
-            <div class="cell col-3 row-2"><div class="hole"></div></div>
-            <div class="cell col-4 row-2"><div class="hole"></div></div>
-            <div class="cell col-5 row-2"><div class="hole"></div></div>
-            <div class="cell col-6 row-2"><div class="hole"></div></div>
-        </div>
-        <div class="row 1">
-            <div class="cell col-0 row-1"><div class="hole"></div></div>
-            <div class="cell col-1 row-1"><div class="hole"></div></div>
-            <div class="cell col-2 row-1"><div class="hole"></div></div>
-            <div class="cell col-3 row-1"><div class="hole"></div></div>
-            <div class="cell col-4 row-1"><div class="hole"></div></div>
-            <div class="cell col-5 row-1"><div class="hole"></div></div>
-            <div class="cell col-6 row-1"><div class="hole"></div></div>
-        </div>
-        <div class="row 0">
-            <div class="cell col-0 row-0"><div class="hole"></div></div>
-            <div class="cell col-1 row-0"><div class="hole"></div></div>
-            <div class="cell col-2 row-0"><div class="hole"></div></div>
-            <div class="cell col-3 row-0"><div class="hole"></div></div>
-            <div class="cell col-4 row-0"><div class="hole"></div></div>
-            <div class="cell col-5 row-0"><div class="hole"></div></div>
-            <div class="cell col-6 row-0"><div class="hole"></div></div>
-            <!-- <div class="cell 6">
-                <div class="piece yellow"></div>
-            </div> -->
-        </div>
-    </div>
-    <div>
-        <button class="button" id="restart-button">Restart</button>
-    </div>
-    <div id="debug"></div>
+    <div id="players-info"></div>
+    <div class="board" id="board"></div>
+    <div id="restart"></div>
+    <!-- <div class="ficha" id="ficha"></div> -->
 </body>
 </html>
