@@ -2,7 +2,6 @@ import { OPENAI_API_KEY } from './env.js';
 
 
 // TODO
-// hacer una pila con las fichas disponibles
 // corregir la ubicación de las pieces para que estén en el div correcto sin que afecte a la posición en pantalla tras la animacion
 // log div para mostrar el histórico de movimientos
 // almacenar el log en un archivo histórico con fecha, id de partida, etc.
@@ -31,6 +30,10 @@ let freeSpot = [0,0,0,0,0,0,0]
 const TEMPERATURE = 0;
 let playerOneColor = '';
 let playerTwoColor = '';
+
+// clases
+// declaro la variable game de forma global porque ahí voy a definir las partidas
+let game;
 
 // ##########################
 // ### construyo el board ###
@@ -114,15 +117,6 @@ function setPlayersInfo(color1,color2,playerMessage){
     playerOneIndicator.appendChild(pieceOne);
     playerTwoIndicator.appendChild(pieceTwo);
 
-    // const playerOneLabel = document.createElement('div');
-    // const playerTwoLabel = document.createElement('div');
-    // playerOneLabel.classList.add('label');
-    // playerOneLabel.textContent = '1';
-    // playerTwoLabel.classList.add('label');
-    // playerTwoLabel.textContent = '2';
-    // pieceOne.appendChild(playerOneLabel);
-    // pieceTwo.appendChild(playerTwoLabel);
-
     const actualTurn = document.getElementById('turn-info');
     // actualTurn.innerHTML = `<span>${playerMessage}:&nbsp;</span>`;
     actualTurn.innerHTML = playerMessage;
@@ -131,7 +125,6 @@ function setPlayersInfo(color1,color2,playerMessage){
     const actualTurnIndicator = document.getElementById('turn');
     
 }
-
 
 // creo los botones de players y levels
 const onePlayerButton = document.createElement('button');
@@ -200,16 +193,26 @@ function animatePiece(color,column,row){
     const divStart = document.querySelector('.cell.col-'+column+'.row-5');
     const divEnd = document.querySelector('.cell.col-'+column+'.row-'+row);
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
+    const four = document.querySelector('.number-four-'+color+'.game-'+games);
     // console.log(piece)
+    console.log('.number-four-'+color+' .game-'+games)
+    console.log(four)
 
     const startY = divStart.offsetTop + divStart.offsetHeight / 2;
     const finalY = divEnd.offsetTop + divEnd.offsetHeight / 2 - startY;
     
-    piece.style.transform = `${startY}px) rotate(${getRandomRotation()}deg)`;
+    piece.style.transform = `${startY}px)`;// rotate(${getRandomRotation()}deg)`;
     setTimeout(() => {
-        piece.style.transform = `translateY(${finalY}px) rotate(${getRandomRotation()}deg)`;
+        piece.style.transform = `translateY(${finalY}px)`; // rotate(${getRandomRotation()}deg)`;
         piece.style.transition= 'all 0.5s ease-in';
     }, 0);
+
+    four.style.transform = `rotate(${getRandomRotation()}deg)`;
+    setTimeout(() => {
+        four.style.transform = `rotate(${getRandomRotation()}deg)`;
+        four.style.transition= 'all 0.5s ease-in';
+    }, 0);
+
 
     piece.classList.remove('row-5');
     piece.classList.add('row-'+row);
@@ -276,14 +279,11 @@ function paintPiece(column,color,freeSpot){
     divPiece.classList.add(color);
     const divNumber4 = document.createElement('div');
     divNumber4.classList.add('number-four-'+color);
+    divNumber4.classList.add('game-'+games);
     divNumber4.textContent = '4';
     divCell.appendChild(divPiece);
     divPiece.appendChild(divNumber4);
 
-    // const divPiece1 = document.createElement('div');
-    // divPiece1.classList.add('small');
-    // divPiece1.style('top:0px')
-    // divPiece.appendChild(divPiece1);
 }
 
 // #################################
@@ -561,7 +561,6 @@ async function easyPlay(IA_COLOR){
 // ############ chatGPT ############
 // #################################
 
-const apiKey = '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';
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
 // const apikey = OPENAI_API_KEY;
 // funcion de espera para que la IA devuelva una jugada
@@ -664,6 +663,10 @@ function chooseTwoPlayer(){
     removeBlur();
     // setBoard(rows,cols);
     printConsole();
+
+    // clases
+    game = new connectFourGame(2, '', playerOneColor, playerTwoColor);
+    console.log(game.getPlays());
 }
 
 function chooseOnePlayer(){
@@ -700,6 +703,10 @@ function chooseEasyLevel(){
     hideLevelButtons();
     hidePlayersButtons();
     printConsole();
+
+    // clases
+    game = new connectFourGame(2, LEVEL, playerOneColor, playerTwoColor);
+    console.log(game.getPlays());
 }
 
 function chooseHardLevel(){
@@ -724,6 +731,10 @@ function chooseHardLevel(){
     hideLevelButtons();
     hidePlayersButtons();
     printConsole();
+
+    // clases
+    game = new connectFourGame(2, LEVEL, playerOneColor, playerTwoColor);
+    console.log(game.getPlays());
 }
 
 // #########################################
@@ -765,6 +776,13 @@ function printConsole(){
     // console.log(`clicked on column: ${columnClicked}`)
     // console.log(printBoard(board));
     console.log(`Game:\nPlayers ${PLAYERS}\nLevel ${LEVEL}\nWinner ${WINNER}\nIAColor ${IA_COLOR}\nTurn ${colorTurn}\nallowClick ${allowClick}\nPlayer 1 ${playerOneColor}\nPlayer 2 ${playerTwoColor}`);
+    
+    // clases
+    // const plays = game.getPlays();
+    // console.log(plays); 
+    // console.log(game.getPlays())
+    // console.log(game.getPlays())
+    // showPlaysHistory(game);
 }
 
 // printConsole();
@@ -782,6 +800,13 @@ cells.forEach(cell => {
                 freeSpot[column] = freeSpot[column] + 1;
                 board[6-freeSpot[column]][column] = colorTurn;
                 checkWinner(board,board.length,board[0].length);
+                
+                // clases
+                if(playerOneColor == colorTurn) game.doPlay(column, 'player 1', 'human', colorTurn);
+                else game.doPlay(column, 'player 2', 'human', colorTurn);
+                // console.log(game);
+                
+                
                 if (PLAYERS == 1) allowClick = false;
                 if (WINNER == 0) changeTurn();
             }
@@ -789,3 +814,63 @@ cells.forEach(cell => {
         printConsole();
     })
 });
+
+
+
+
+
+
+
+// ###################################
+// ############# clases ##############
+// ###################################
+
+
+// trato de crear una clase para ir almacenando las partidas jugadas
+
+class connectFourGame {
+    constructor(players, level, playerOneColor, playerTwoColor) {
+        this.players = players;
+        this.level = level;
+        this.playerOneColor = playerOneColor;
+        this.playerTwoColor = playerTwoColor;
+        this.plays = [];
+    }
+
+    doPlay(column, player, kind, color) {
+        this.plays.push({ column, player, kind, color});
+    }
+
+    getPlays() {
+        return this.plays;
+    }
+}
+
+// Ejemplo de cómo crear una partida y realizar una jugada:
+// const game = new connectFourGame(2, 'easy', 'red', 'yellow');
+// game.doPlay(3, 'red');
+// game.doPlay(2, 'yellow');
+
+// Obtener las jugadas realizadas
+// const plays = game.getPlays();
+// console.log(plays); 
+
+
+function showPlaysHistory(game) {
+    const historyElement = document.getElementById('plays-history');
+    historyElement.innerHTML = '';
+
+    const plays = game.getPlays();
+
+    const playsList = document.createElement('ul');
+
+    plays.forEach((play, index) => {
+        const playItem = document.createElement('li');
+        playItem.textContent = `Play: ${index + 1}: Column ${play.column}, Player ${play.player}`;
+        playsList.appendChild(playItem);
+    });
+
+    historyElement.appendChild(listaJugadas);
+}
+
+// showPlaysHistory(game);
