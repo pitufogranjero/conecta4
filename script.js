@@ -183,8 +183,6 @@ if(restartButton){
     });
 }
 
-
-
 // de la lista de clases obtenida, selecciono la que es numerica
 function numericClass(list){
     let numberClass = 0;
@@ -198,7 +196,7 @@ function numericClass(list){
 
 // animar la caída de la ficha hasta su posición 
 function animatePiece(color,column,row){
-    console.log(row)
+    // console.log(row)
     const divStart = document.querySelector('.cell.col-'+column+'.row-5');
     const divEnd = document.querySelector('.cell.col-'+column+'.row-'+row);
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
@@ -206,12 +204,13 @@ function animatePiece(color,column,row){
 
     const startY = divStart.offsetTop + divStart.offsetHeight / 2;
     const finalY = divEnd.offsetTop + divEnd.offsetHeight / 2 - startY;
-        
-    piece.style.transform = `${startY}px)`;
+    
+    piece.style.transform = `${startY}px) rotate(${getRandomRotation()}deg)`;
     setTimeout(() => {
-        piece.style.transform = `translateY(${finalY}px)`;
+        piece.style.transform = `translateY(${finalY}px) rotate(${getRandomRotation()}deg)`;
         piece.style.transition= 'all 0.5s ease-in';
     }, 0);
+
     piece.classList.remove('row-5');
     piece.classList.add('row-'+row);
 }
@@ -244,10 +243,19 @@ function changeTurn(){
         // console.log('--> turn to player');
         setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Your Turn');
     }
+    else if (PLAYERS == 1 && LEVEL == 'easy' && colorTurn == PLAYER_COLOR) {
+        // console.log('--> turn to player');
+        setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Your Turn');
+    }
     else if (PLAYERS == 1 && LEVEL == 'hard' && colorTurn == IA_COLOR) {
         // console.log('--> turn to IA');
         setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Turn to IA');
         iaPlay(board,IA_COLOR);
+    }
+    else if (PLAYERS == 1 && LEVEL == 'easy' && colorTurn == IA_COLOR) {
+        // console.log('--> turn to Computer');
+        setPlayersInfo(PLAYER_COLOR,IA_COLOR,'Turn to Computer');
+        easyPlay(IA_COLOR);
     }
     highlightTurn(colorTurn);
 }
@@ -266,14 +274,17 @@ function paintPiece(column,color,freeSpot){
     divPiece.classList.add('piece');
     divPiece.classList.add('turn-'+games);
     divPiece.classList.add(color);
+    const divNumber4 = document.createElement('div');
+    divNumber4.classList.add('number-four-'+color);
+    divNumber4.textContent = '4';
     divCell.appendChild(divPiece);
+    divPiece.appendChild(divNumber4);
 
     // const divPiece1 = document.createElement('div');
     // divPiece1.classList.add('small');
     // divPiece1.style('top:0px')
     // divPiece.appendChild(divPiece1);
 }
-
 
 // #################################
 // ### COMPROBACION DE GANADORES ###
@@ -435,8 +446,6 @@ function winnerMessage(color){
     divWinner.innerHTML = "";
     divWinner.innerHTML = 'The winner is '+color;
     divWinner.classList.add(color);
-    
-    // turnSpan.textContent == '';
 }
 
 // restart game
@@ -496,6 +505,11 @@ function getRandomColumn() {
     return Math.floor(Math.random() * 7);
 }
 
+// aleatorio para simular la rotacion de la ficha
+function getRandomRotation() {
+    return Math.floor(Math.random() * 360);
+}
+
 // me devuelve el otro color
 function swapColors(inputColor) {
     const colorMap = {
@@ -518,10 +532,34 @@ function checkFullColumn(freeSpot){
     }  
     return message;
 }
+
+function randomWait() {
+    const randomTime = Math.floor(Math.random() * (2000 - 500 + 1)) + 500;
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(); 
+        }, randomTime);
+    });
+}
+
+async function easyPlay(IA_COLOR){
+    const columnSelected = getRandomColumn();
+    await randomWait();
+    paintPiece(columnSelected,IA_COLOR);
+    animatePiece(colorTurn,columnSelected,freeSpot[columnSelected])
+    freeSpot[columnSelected] = freeSpot[columnSelected] + 1;
+    board[6-freeSpot[columnSelected]][columnSelected] = colorTurn;
+    
+    allowClick = true;
+
+    checkWinner(board,board.length,board[0].length);
+    if (WINNER == 0) changeTurn();
+}
+
 // #################################
 // ############ chatGPT ############
 // #################################
-
 
 const apiKey = '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';
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
@@ -533,7 +571,7 @@ async function iaPlay(board,IA_COLOR){
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer "+apiKey);
     
-    const prompt = `Estamos jugando a Conecta 4 y tu color es el ${IA_COLOR}, ahora es tu turno y el tablero es el siguiente: \nfila superior o 0: ${board[0]}\nfila 1: ${board[1]}\nfila 2: ${board[2]}\nfila 3: ${board[3]}\nfila 4: ${board[4]}\nfila 5: ${board[5]},\n¿cual sería tu próxima jugada? \nTen en cuenta que:${checkFullColumn(freeSpot)}\nno puedes jugar siempre en la misma columna\nRespóndeme sólo con el número de columna donde pondrías tu siguiente ficha.\nLimitate sólo a responder con el dígito de la columna, es decir, un numero del 0 al 6`;
+    const prompt = `Estamos jugando a Conecta 4 tu eres un profesional que me va a impedir ganar y tu color es el ${IA_COLOR}, ahora es tu turno y el tablero es el siguiente: \nfila superior o 0: ${board[0]}\nfila 1: ${board[1]}\nfila 2: ${board[2]}\nfila 3: ${board[3]}\nfila 4: ${board[4]}\nfila 5: ${board[5]},\n¿cual sería tu próxima jugada? \nTen en cuenta que:${checkFullColumn(freeSpot)}\nno puedes jugar siempre en la misma columna\nSi ves que hay posibilidad que yo haga cuatro colores consecutivos, bien sea de forma horizontal, diagonal o vertical, debes tratar de evitarlo poniendo tu ficha en la columna que no me permita ganar\n\nRespóndeme sólo con el número de columna donde pondrías tu siguiente ficha.\nLimitate sólo a responder con el dígito de la columna, es decir, un numero del 0 al 6`;
     console.log(prompt)
 
     var raw = JSON.stringify({
@@ -563,19 +601,19 @@ async function iaPlay(board,IA_COLOR){
             throw new Error('La solicitud no se completó correctamente.');
         }
         const data = await response.json(); 
-        let columnaElegida = null;
+        let columnSelected = null;
 
-        while (!columnaElegida) {
-            columnaElegida = data.choices[0].message.content;
-            columnaElegida = columnaElegida.match(/[0-6]/);
+        while (!columnSelected) {
+            columnSelected = data.choices[0].message.content;
+            columnSelected = columnSelected.match(/[0-6]/);
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        console.log('la columna elegida por la IA es: ' + columnaElegida);
-        paintPiece(columnaElegida,colorTurn);
-        animatePiece(colorTurn,columnaElegida,freeSpot[columnaElegida])
-        freeSpot[columnaElegida] = freeSpot[columnaElegida] + 1;
-        board[6-freeSpot[columnaElegida]][columnaElegida] = colorTurn;
+        console.log('la columna elegida por la IA es: ' + columnSelected);
+        paintPiece(columnSelected,colorTurn);
+        animatePiece(colorTurn,columnSelected,freeSpot[columnSelected])
+        freeSpot[columnSelected] = freeSpot[columnSelected] + 1;
+        board[6-freeSpot[columnSelected]][columnSelected] = colorTurn;
         
         allowClick = true;
 
@@ -655,6 +693,7 @@ function chooseEasyLevel(){
         allowClick = false;
         setPlayersInfo(playerOneColor,playerTwoColor,'Turn to Computer');
         // aquí pongo la funcion para que juegue el nivel easy
+        easyPlay(IA_COLOR);
     }
     highlightTurn(colorTurn);
     removeBlur();

@@ -7,6 +7,12 @@ body {
     color: #fff;
 }
 
+.logo{
+    /* width: 300px; */
+    margin: 20px;
+    max-width: 300px;
+}
+
 .board {
     display: inline-block;
     position: relative;
@@ -102,6 +108,20 @@ body {
     left: 50%; */
     /* transform: translate(-50%, -50%); */
     z-index: 1;
+}
+
+.number-four-yellow{
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    padding-top: 8px;
+    color: #f1c40f;
+    font-weight: bold;
+}
+
+.number-four-red{
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+    padding-top: 8px;
+    color: #e74c3c;
+    font-weight: bold;
 }
 
 .piece::before {
