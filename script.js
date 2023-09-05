@@ -1,6 +1,3 @@
-import { OPENAI_API_KEY } from './env.js';
-
-
 // TODO
 // corregir la ubicación de las pieces para que estén en el div correcto sin que afecte a la posición en pantalla tras la animacion
 // log div para mostrar el histórico de movimientos
@@ -12,7 +9,6 @@ import { OPENAI_API_KEY } from './env.js';
 // diseñar el prompt para preguntar a chatGPT cual sería la siguiente jugada
 // limitar para que no puedas jugar cuando esta blur
 // limitar el numero de fichas en una columna a 6
-
 
 // variables
 const rows = 6;
@@ -561,6 +557,7 @@ async function easyPlay(IA_COLOR){
 // ############ chatGPT ############
 // #################################
 
+const apiKey = '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';
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
 // const apikey = OPENAI_API_KEY;
 // funcion de espera para que la IA devuelva una jugada
