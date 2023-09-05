@@ -207,6 +207,11 @@ body {
     /* box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); */
     overflow: hidden;
     margin: auto;
+    max-width: 365px;
+}
+
+.highlight{
+    box-shadow: 0px 0px 10px 0px white;
 }
 
 .label {
