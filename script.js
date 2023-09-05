@@ -557,7 +557,6 @@ async function easyPlay(IA_COLOR){
 // ############ chatGPT ############
 // #################################
 
-const apiKey = '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';
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
 // const apikey = OPENAI_API_KEY;
 // funcion de espera para que la IA devuelva una jugada
