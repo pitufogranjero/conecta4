@@ -3,6 +3,7 @@
 // almacenar el log en un archivo histórico con fecha, id de partida, etc.
 
 // DONE
+// mostrar que la IA está pensando
 // crear con clases un objeto por cada partida y poder mostrarlos en consola o en pantalla a modo de histórico
 // log div para mostrar el histórico de movimientos
 // completar la funcion que verifica si hay 4 consecutivas en DIAGONAL
@@ -30,6 +31,11 @@ let freeSpot = [0,0,0,0,0,0,0]
 const TEMPERATURE = 0;
 let playerOneColor = '';
 let playerTwoColor = '';
+
+
+// spinner
+const spinner = document.createElement('div');
+spinner.setAttribute('id','spinner');
 
 // clases
 // declaro la variable game de forma global porque ahí voy a definir las partidas
@@ -117,12 +123,18 @@ function setPlayersInfo(color1,color2,playerMessage){
     playerOneIndicator.appendChild(pieceOne);
     playerTwoIndicator.appendChild(pieceTwo);
 
+    // meto el spinner en la capa del color de la iA
+    if(PLAYERS == 1 && LEVEL == 'hard') pieceTwo.appendChild(spinner);
+
     const actualTurn = document.getElementById('turn-info');
     // actualTurn.innerHTML = `<span>${playerMessage}:&nbsp;</span>`;
     actualTurn.innerHTML = playerMessage;
     // actualTurn.innerHTML += `<span id='turn' class='${colorTurn}-text'>${colorTurn}</span>`;
     // actualTurn.innerHTML += `<div class="piece ${colorTurn}" style="width:40px; display:flex"></div>`;
     const actualTurnIndicator = document.getElementById('turn');
+
+    
+    
     
 }
 
@@ -574,7 +586,9 @@ const apiKey = TOKEN['TOKEN'];
 
 // funcion de espera para que la IA devuelva una jugada
 async function iaPlay(board,IA_COLOR){
-    console.log('ejecuto iaPlay')
+    console.log('run iaPlay');
+    spinner.style.opacity = '50%';
+
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer "+apiKey);
@@ -618,6 +632,10 @@ async function iaPlay(board,IA_COLOR){
 
         console.log('la columna elegida por la IA es: ' + columnSelected);
         paintPiece(columnSelected,colorTurn);
+        
+        // oculto el spinner
+        spinner.style.opacity = '0';
+
         animatePiece(colorTurn,columnSelected,freeSpot[columnSelected])
         freeSpot[columnSelected] = freeSpot[columnSelected] + 1;
         board[6-freeSpot[columnSelected]][columnSelected] = colorTurn;
