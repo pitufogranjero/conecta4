@@ -191,8 +191,7 @@ function animatePiece(color,column,row){
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
     const four = document.querySelector('.number-four-'+color+'.game-'+games);
     // console.log(piece)
-    console.log('.number-four-'+color+' .game-'+games)
-    console.log(four)
+    // console.log(four)
 
     const startY = divStart.offsetTop + divStart.offsetHeight / 2;
     const finalY = divEnd.offsetTop + divEnd.offsetHeight / 2 - startY;
@@ -534,7 +533,7 @@ function randomWait() {
 
     return new Promise((resolve) => {
         setTimeout(() => {
-          resolve(); 
+            resolve(); 
         }, randomTime);
     });
 }
@@ -558,7 +557,8 @@ async function easyPlay(IA_COLOR){
 // #################################
 
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
-// const apikey = OPENAI_API_KEY;
+import TOKEN from './js/config.js';
+const apiKey = TOKEN;
 // funcion de espera para que la IA devuelva una jugada
 async function iaPlay(board,IA_COLOR){
     console.log('ejecuto iaPlay')
