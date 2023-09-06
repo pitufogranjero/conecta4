@@ -124,7 +124,7 @@ function setPlayersInfo(color1,color2,playerMessage){
     playerTwoIndicator.appendChild(pieceTwo);
 
     // meto el spinner en la capa del color de la iA
-    if(PLAYERS == 1 && LEVEL == 'hard') pieceTwo.appendChild(spinner);
+    if(PLAYERS == 1) pieceTwo.appendChild(spinner);
 
     const actualTurn = document.getElementById('turn-info');
     // actualTurn.innerHTML = `<span>${playerMessage}:&nbsp;</span>`;
@@ -308,90 +308,6 @@ function paintPiece(column,color,freeSpot){
 // ### COMPROBACION DE GANADORES ###
 // #################################
 
-// comprobar si hay 4 fichas consecutivas iguales en las filas
-function checkHorizontals (board,color){
-    let sum = 1;
-    // console.log(printBoard(board))
-    console.log('check horizontals '+color)
-    // console.log('rows '+board.length)
-    // console.log('cols '+board[0].length)
-    // console.log('sum '+sum)
-    // recorro las filas
-    for (let row = 0; row < board.length-3; row++) {
-        // console.log('row number '+row)
-        // recorro las columnas
-        for(let col = 0; col < board[row].length; col++){
-            // console.log('col number '+col)
-            // console.log('posicion '+board[row][col]);
-            if (board[row][col+1] == color && board[row][col] == color) {
-                sum = sum + 1;
-                // console.log(color+' fila '+i+' suma '+sum)
-            } else {
-                sum = 1;
-                // console.log(color+' fila '+i+' suma '+sum)
-            }
-            if (sum == 4) return true;
-        }
-    }
-
-}
-
-// comprobar si hay 4 fichas consecutivas iguales en las columnas
-function checkVerticals(board,color) {
-    let sum = 1;
-    console.log('check verticals '+color)
-    // recorro las columnas
-    for(let col = 0; col < board[0].length-1; col++){
-        // recorro las filas
-        for (let row = 0; row < board.length-1; row++) {
-            // console.log('row '+row+' col '+col+' piece '+board[row][col])
-            if (board[row+1][col] == color && board[row][col] == color) {
-                sum = sum + 1;
-                // console.log(color+' fila '+row+' suma '+sum)
-            } else {
-                sum = 1;
-            }
-            if (sum == 4) return true;
-        }
-    }
-}
-
-// comprobar si hay 4 fichas consecutivas iguales en las diagonales
-function checkDiagonals(board,color) {
-    let sum = 1;
-    console.log('check diagonals '+color)
-    // primero compruebo una de las diagonales
-    // recorro las columnas
-    for(let col = 0; col < board[0].length; col++){
-        // recorro las filas
-        for (let row = 0; row < board.length; row++) {
-            console.log('row '+row+' col '+col+' piece '+board[row][col]+' suma '+sum)
-            if (board[row][col] == color && board[row+1][col+1] == color && board[row+2][col+2] == color && board[row+3][col+3] == color) {
-                sum = sum + 1;
-            } else {
-                sum = 1;
-            }
-            if (sum == 4) return true;
-        }
-    }
-    // ahora compruebo la otra de las diagonales
-    sum = 1;
-    // recorro las columnas
-    for(let col = 0; col < board[0].length; col++){
-        // recorro las filas
-        for (let row = 0; row < board.length; row++) {
-            // console.log('row '+row+' col '+col+' piece '+board[row][col])
-            if (board[row][col] == color && board[row-1][col+1] == color && board[row-2][col+2] == color && board[row-3][col+3] == color) {
-                sum = sum + 1;
-                // console.log(color+' fila '+row+' suma '+sum)
-            } else {
-                sum = 1;
-            }
-            if (sum == 4) return true;
-        }
-    }
-}
-
 // si hay ganador marcarlo
 function checkWinner(board, rows, cols){
     // printBoard(board);
@@ -436,20 +352,6 @@ function checkWinner(board, rows, cols){
             }
         }
     }
-    // try {
-    //     if (checkHorizontals(board, 'yellow') || checkVerticals(board, 'yellow') || checkDiagonals(board, 'yellow')) {
-    //         winnerMessage('yellow');
-    //         return;
-    //     }
-
-    //     if (checkHorizontals(board, 'red') || checkVerticals(board, 'red') || checkDiagonals(board, 'red')) {
-    //         winnerMessage('red');
-    //         return;
-    //     }
-
-    //     } catch (error) {
-    //     // Manejar errores si es necesario
-    //     }
 }
 
 // winner message
@@ -559,6 +461,7 @@ function randomWait() {
 }
 
 async function easyPlay(IA_COLOR){
+    spinner.style.opacity = '50%';
     const columnSelected = getRandomColumn();
     await randomWait();
     paintPiece(columnSelected,IA_COLOR);
@@ -569,6 +472,8 @@ async function easyPlay(IA_COLOR){
     allowClick = true;
 
     checkWinner(board,board.length,board[0].length);
+    spinner.style.opacity = '0';
+
     if (WINNER == 0) changeTurn();
 
     // clases
