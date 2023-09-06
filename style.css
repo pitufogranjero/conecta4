@@ -254,7 +254,7 @@ body {
     border-top:4px solid white;
     border-radius:50%;
     margin: -4px 0px 0px -4px;
-    /* opacity: 50%; */
+    opacity: 0%;
 
     -webkit-transition-property: -webkit-transform;
     -webkit-transition-duration: 1.2s;
