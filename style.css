@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     text-align: center;
     background-color: #1e272e;
     margin: 0;
@@ -57,7 +57,7 @@ body {
     position: relative;
     width: 70%;
     height: 50px;
-    font-weight: bold;
+    font-weight: 100;
 }
 
 .turn-info.selected {
@@ -112,16 +112,16 @@ body {
 
 .number-four-yellow{
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
-    padding-top: 10px;
+    /* padding-top: 10px; */
     color: #f1c40f;
-    font-weight: bolder;
+    font-weight:900;
 }
 
 .number-four-red{
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
-    padding-top: 10px;
+    /* padding-top: 10px; */
     color: #e74c3c;
-    font-weight: bolder;
+    font-weight: 900;
 }
 
 .piece::before {

@@ -204,7 +204,7 @@ function animatePiece(color,column,row){
 
     four.style.transform = `rotate(${getRandomRotation()}deg)`;
     setTimeout(() => {
-        four.style.transform = `rotate(${getRandomRotation()}deg)`;
+        four.style.transform = `translateY(8px) rotate(${getRandomRotation()}deg)`;
         four.style.transition= 'all 0.5s ease-in';
     }, 0);
 
@@ -441,6 +441,8 @@ function winnerMessage(color){
     divWinner.innerHTML = "";
     divWinner.innerHTML = 'The winner is '+color;
     divWinner.classList.add(color);
+    console.log(game.getPlays());
+    // document.getElementById('plays-history').textContent = game.getPlays();
 }
 
 // restart game
@@ -550,6 +552,10 @@ async function easyPlay(IA_COLOR){
 
     checkWinner(board,board.length,board[0].length);
     if (WINNER == 0) changeTurn();
+
+    // clases
+    game.doPlay(columnSelected, 'player 2', 'computer', IA_COLOR);
+
 }
 
 // #################################
@@ -612,6 +618,10 @@ async function iaPlay(board,IA_COLOR){
         
         allowClick = true;
 
+        // clases
+        game.doPlay(columnSelected, 'player 2', 'computer', IA_COLOR);
+
+
         checkWinner(board,board.length,board[0].length);
         if (WINNER == 0) changeTurn();
 
@@ -662,7 +672,7 @@ function chooseTwoPlayer(){
 
     // clases
     game = new connectFourGame(2, '', playerOneColor, playerTwoColor);
-    console.log(game.getPlays());
+    // console.log(game.getPlays());
 }
 
 function chooseOnePlayer(){
@@ -702,7 +712,7 @@ function chooseEasyLevel(){
 
     // clases
     game = new connectFourGame(2, LEVEL, playerOneColor, playerTwoColor);
-    console.log(game.getPlays());
+    // console.log(game.getPlays());
 }
 
 function chooseHardLevel(){
@@ -730,7 +740,7 @@ function chooseHardLevel(){
 
     // clases
     game = new connectFourGame(2, LEVEL, playerOneColor, playerTwoColor);
-    console.log(game.getPlays());
+    // console.log(game.getPlays());
 }
 
 // #########################################
