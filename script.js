@@ -1,14 +1,18 @@
 // TODO
 // corregir la ubicación de las pieces para que estén en el div correcto sin que afecte a la posición en pantalla tras la animacion
-// log div para mostrar el histórico de movimientos
 // almacenar el log en un archivo histórico con fecha, id de partida, etc.
 
 // DONE
+// crear con clases un objeto por cada partida y poder mostrarlos en consola o en pantalla a modo de histórico
+// log div para mostrar el histórico de movimientos
 // completar la funcion que verifica si hay 4 consecutivas en DIAGONAL
 // crear las funciones para "1 player" y "2 players"
 // diseñar el prompt para preguntar a chatGPT cual sería la siguiente jugada
 // limitar para que no puedas jugar cuando esta blur
 // limitar el numero de fichas en una columna a 6
+
+
+import TOKEN from './js/config.js';
 
 // variables
 const rows = 6;
@@ -185,7 +189,7 @@ function numericClass(list){
 
 // animar la caída de la ficha hasta su posición 
 function animatePiece(color,column,row){
-    // console.log(row)
+    console.log(row)
     const divStart = document.querySelector('.cell.col-'+column+'.row-5');
     const divEnd = document.querySelector('.cell.col-'+column+'.row-'+row);
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
@@ -196,21 +200,28 @@ function animatePiece(color,column,row){
     const startY = divStart.offsetTop + divStart.offsetHeight / 2;
     const finalY = divEnd.offsetTop + divEnd.offsetHeight / 2 - startY;
     
-    piece.style.transform = `${startY}px)`;// rotate(${getRandomRotation()}deg)`;
+    piece.style.transform = `${startY}px`;// rotate(${getRandomRotation()}deg)`;
     setTimeout(() => {
         piece.style.transform = `translateY(${finalY}px)`; // rotate(${getRandomRotation()}deg)`;
         piece.style.transition= 'all 0.5s ease-in';
     }, 0);
 
-    four.style.transform = `rotate(${getRandomRotation()}deg)`;
+    four.style.transform = `${startY+80}px rotate(${getRandomRotation()}deg)`;
     setTimeout(() => {
-        four.style.transform = `translateY(8px) rotate(${getRandomRotation()}deg)`;
-        four.style.transition= 'all 0.5s ease-in';
+        const finalRotation = (5.2-row) * getRandomRotation();
+        const rotationTime = (1-row) * 0.5;
+        four.style.transform = `translateY(8px) rotate(${finalRotation}deg)`;
+        four.style.transition= `all ${rotationTime}s ease-in`;
     }, 0);
 
 
     piece.classList.remove('row-5');
     piece.classList.add('row-'+row);
+}
+
+// aleatorio para simular la rotacion de la ficha
+function getRandomRotation() {
+    return Math.floor(Math.random() * 90);
 }
 
 // resaltar el color correspondiente al turno actual
@@ -371,7 +382,7 @@ function checkDiagonals(board,color) {
 
 // si hay ganador marcarlo
 function checkWinner(board, rows, cols){
-    printBoard(board);
+    // printBoard(board);
     console.log('is there a winner?')
     // horizontal
     for (let r=0; r<rows; r++){
@@ -502,11 +513,6 @@ function getRandomColumn() {
     return Math.floor(Math.random() * 7);
 }
 
-// aleatorio para simular la rotacion de la ficha
-function getRandomRotation() {
-    return Math.floor(Math.random() * 360);
-}
-
 // me devuelve el otro color
 function swapColors(inputColor) {
     const colorMap = {
@@ -563,8 +569,9 @@ async function easyPlay(IA_COLOR){
 // #################################
 
 const url_chatGPT = 'https://api.openai.com/v1/chat/completions';
-import TOKEN from './js/config.js';
-const apiKey = TOKEN;
+const apiKey = TOKEN['TOKEN'];
+// console.log(TOKEN['TOKEN'])
+
 // funcion de espera para que la IA devuelva una jugada
 async function iaPlay(board,IA_COLOR){
     console.log('ejecuto iaPlay')
@@ -587,13 +594,12 @@ async function iaPlay(board,IA_COLOR){
     });
 
     var requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
     };
 
-    // console.log(raw)
 
     try {
         const response = await fetch(url_chatGPT, requestOptions);
