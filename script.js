@@ -189,7 +189,7 @@ function numericClass(list){
 
 // animar la caída de la ficha hasta su posición 
 function animatePiece(color,column,row){
-    console.log(row)
+    // console.log(row)
     const divStart = document.querySelector('.cell.col-'+column+'.row-5');
     const divEnd = document.querySelector('.cell.col-'+column+'.row-'+row);
     const piece = document.querySelector('.piece.'+color+'.turn-'+games);
